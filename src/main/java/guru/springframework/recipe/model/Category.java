@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@EqualsAndHashCode(exclude = {"recipes"})
 @Entity
 public class Category {
 
@@ -15,7 +16,7 @@ public class Category {
     private Long id;
     private String description;
 
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "categories")
     private Set<Recipe> recipes = new HashSet<>();
 
 }

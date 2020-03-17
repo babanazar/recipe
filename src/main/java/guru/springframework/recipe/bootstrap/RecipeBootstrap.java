@@ -4,7 +4,6 @@ import guru.springframework.recipe.model.*;
 import guru.springframework.recipe.repository.CategoryRepository;
 import guru.springframework.recipe.repository.RecipeRepository;
 import guru.springframework.recipe.repository.UnitOfMeasureRepository;
-import guru.springframework.recipe.service.UnitOfMeasureService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -133,6 +132,10 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         guacRecipe.getCategories().add(americanCategory);
         guacRecipe.getCategories().add(mexicanCategory);
 
+        guacRecipe.setUrl("https://www.simplyrecipes.com/recipes/perfect_guacamole/");
+        guacRecipe.setServings(4);
+        guacRecipe.setSource("Simply Recipes");
+
         //add to return list
         recipes.add(guacRecipe);
 
@@ -200,7 +203,9 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        recipeCategory.saveAll(getRecipes());
+        List<Recipe> recipes = getRecipes();
+        Iterable<Recipe> savedRecipes = recipeCategory.saveAll(recipes);
+
         log.debug("Loading Bootstrap Data");
     }
 }

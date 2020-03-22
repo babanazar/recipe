@@ -3,11 +3,16 @@ package guru.springframework.recipe.service;
 import guru.springframework.recipe.command.RecipeCommand;
 import guru.springframework.recipe.converter.RecipeCommandToRecipe;
 import guru.springframework.recipe.converter.RecipeToRecipeCommand;
+import guru.springframework.recipe.exception.NotFoundException;
 import guru.springframework.recipe.model.Recipe;
 import guru.springframework.recipe.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -41,8 +46,8 @@ public class RecipeServiceImpl implements RecipeService {
 
         Optional<Recipe> recipeOptional = recipeRepository.findById(l);
 
-        if (!recipeOptional.isPresent()){
-            throw new RuntimeException("Recipe Not Found");
+        if (!recipeOptional.isPresent()) {
+            throw new NotFoundException("Recipe Not Found. For ID value: " + l.toString());
         }
 
         return recipeOptional.get();
@@ -69,4 +74,15 @@ public class RecipeServiceImpl implements RecipeService {
         recipeRepository.deleteById(idToDelete);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFound(Exception exception) {
+        log.error("Handling not found exception");
+        log.error(exception.getMessage());
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+        return modelAndView;
+    }
 }
